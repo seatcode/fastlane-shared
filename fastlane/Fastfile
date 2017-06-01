@@ -37,7 +37,7 @@ error do |lane, exception|
   UI.error "exception: #{exception.message}"
 end
 
-desc "Will Check and show all fastlane dependencies, also downloads/updates them for you"
+desc "Will Check and show all fastlane projects dependencies, also downloads/updates them for you"
 lane :dependencies do
   lg_dependencies(
     lg_just_info: false
@@ -55,7 +55,7 @@ end
 platform :ios do
 
   desc "Sets a new tag to the current Repository, update podspec and push everything. You can use allow_warnings:true as parameter"
-  lane :lib_tag do |options|
+  private_lane :lib_tag do |options|
 
     version = version_get_podspec(path: ENV["PODSPEC_FILE"])
 
@@ -156,7 +156,7 @@ end
 platform :android do
 
   desc "Sets a new tag to the current Repository, updates gradle repo"
-  lane :lib_tag do |options|
+  private_lane :lib_tag do |options|
 
     if git_branch != "develop"
       continue = ask("\n\nWARNING! You are creating a tag in a branch different than DEVELOP, do you want yo continue? (y/n)".yellow)
