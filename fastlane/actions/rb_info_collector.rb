@@ -5,6 +5,8 @@ module Fastlane
       RB_INFO_SCHEME_NAME = :RB_INFO_SCHEME_NAME
       RB_INFO_VERSION_NUMBER = :RB_INFO_VERSION_NUMBER
       RB_INFO_BUILD_NUMBER = :RB_INFO_BUILD_NUMBER
+      RB_INFO_VERSION_NAME = :RB_INFO_VERSION_NAME
+      RB_INFO_VERSION_CODE = :RB_INFO_VERSION_CODE
       RB_INFO_BETA_TESTERS_GROUPS = :RB_INFO_BETA_TESTERS_GROUPS
       RB_INFO_API_SERVER = :RB_INFO_API_SERVER
       RB_INFO_SIMULATOR = :RB_INFO_SIMULATOR
@@ -19,6 +21,8 @@ module Fastlane
         ask_for_scheme_name = params[:ask_for_scheme_name]
         ask_for_version_number = params[:ask_for_version_number]
         ask_for_build_number = params[:ask_for_build_number]
+        ask_for_version_name = params[:ask_for_version_name]
+        ask_for_version_code = params[:ask_for_version_code]
         ask_for_beta_testers_groups = params[:ask_for_beta_testers_groups]
         ask_for_api_server = params[:ask_for_api_server]
         ask_for_simulator = params[:ask_for_simulator]
@@ -73,6 +77,26 @@ module Fastlane
           else
             Actions.lane_context[SharedValues::RB_INFO_BUILD_NUMBER] = build_number
             ENV["RB_INFO_BUILD_NUMBER"] = build_number
+          end
+        end
+
+        if ask_for_version_name
+          version_name = ask("Version name = ".yellow)
+          if version_name.nil?
+            raise "The version name is necessary to continue with this script."
+          else
+            Actions.lane_context[SharedValues::RB_INFO_VERSION_NAME] = version_name
+            ENV["RB_INFO_VERSION_NAME"] = version_name
+          end
+        end
+
+        if ask_for_version_code
+          version_code = ask("Version code = ".yellow)
+          if version_code.nil?
+            raise "The version code is necessary to continue with this script."
+          else
+            Actions.lane_context[SharedValues::RB_INFO_VERSION_CODE] = version_code
+            ENV["RB_INFO_VERSION_CODE"] = version_code
           end
         end
 
@@ -150,6 +174,16 @@ module Fastlane
                                        description: "Mark as true if you wanna ask for this flag and collect the info to share it in the lane",
                                        optional: true,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :ask_for_version_name,
+                                       env_name: "RB_INFO_ASK_FOR_VERSION_NAME",
+                                       description: "Mark as true if you wanna ask for this flag and collect the info to share it in the lane",
+                                       optional: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :ask_for_version_code,
+                                       env_name: "RB_INFO_ASK_FOR_VERSION_CODE",
+                                       description: "Mark as true if you wanna ask for this flag and collect the info to share it in the lane",
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :ask_for_beta_testers_groups,
                                        env_name: "RB_INFO_ASK_FOR_BETA_TESTERS_GROUPS",
                                        description: "Mark as true if you wanna ask for this flag and collect the info to share it in the lane",
@@ -179,11 +213,13 @@ module Fastlane
           ['RB_INFO_SCHEME_NAME', 'Target name (letter)'],
           ['RB_INFO_VERSION_NUMBER', 'Version number'],
           ['RB_INFO_BUILD_NUMBER', 'Build number'],
+          ['RB_INFO_VERSION_NAME', 'Version name'],
+          ['RB_INFO_VERSION_CODE', 'Version code'],
           ['RB_INFO_BETA_TESTERS_GROUPS', 'Beta testers groups'],
           ['RB_INFO_API_SERVER', 'API Server'],
           ['RB_INFO_SIMULATOR', 'Simulator'],
           ['RB_INFO_BUILD_CONFIGURATION', 'Build configuration'],
-	  ['RB_API_ENVIRONMENT', 'API Environment']
+	        ['RB_API_ENVIRONMENT', 'API Environment']
         ]
       end
 
@@ -192,7 +228,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        platform == :ios || platform == :android
       end
 
     end
