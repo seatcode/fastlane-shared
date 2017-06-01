@@ -25,7 +25,7 @@ end
 after_all do |lane|
   notification(
     title: "Fastlane '#{lane}'",
-    message: "finished successfully"
+    message: "finished successfully 🎉🎉"
   )
 end
 
@@ -154,6 +154,72 @@ platform :ios do
 end
 
 platform :android do
+
+  desc "Sets a new tag to the current Repository, updates gradle repo"
+  lane :lib_tag do |options|
+
+    if git_branch != "develop"
+      continue = ask("\n\nWARNING! You are creating a tag in a branch different than DEVELOP, do you want yo continue? (y/n)".yellow)
+      if continue.nil? || continue != "y"
+        raise "Move to the correct branch and restart the process :)"
+      end
+    end
+
+    sh("git fetch")
+    local = sh("git rev-parse @")
+    remote = sh("git rev-parse @{u}")
+    base =  sh("git merge-base @ @{u}")
+
+    if local != remote
+      automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
+      if automatic_pull != "y"
+        raise "Sync your branch and restart the process :)"
+      end
+    end
+
+    version = get_version_name(app_folder_name: ENV['MODULE_NAME'])
+
+    UI.message ("➡️  Current version: #{version}").blue
+
+    rb_info_collector(
+      ask_for_version_name: true,
+    )
+
+    version_name = Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NAME]
+
+    if Gem::Version.new(version) > Gem::Version.new(version_name)
+      raise "Current version is bigger than the one you provided. Check it and restart the process :)"
+    end
+
+    ml_update_android_version(
+      version_name: version_name,
+      autoincrement: true,
+      module_name: ENV["MODULE_NAME"]
+    )
+
+    git_commit(
+      path: ".",
+      message: "Version Bump to " + version_name
+    )
+
+    add_git_tag(
+      tag: version_name,
+    )
+
+    push_to_git_remote(
+      local_branch: git_branch,
+    )
+
+    # Publish to my maven repo
+    gradle(task: "publish")
+
+    slack(
+      message: "New tag in #{ENV["PROJECT_NAME"]} Android `#{version_name}` @channel :tada:",
+      success: true,
+      channel: "#mobile",  # Optional, by default will post to the default channel configured for the POST URL.
+    )
+  end
+
   desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
   lane :ci do
     pullRequest = nil

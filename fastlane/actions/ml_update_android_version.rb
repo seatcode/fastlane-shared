@@ -12,6 +12,7 @@ module Fastlane
         version_code = params[:version_code]
         autoincrement = params[:autoincrement] #will only work if version_code is not passed
         project_root = params[:project_root]
+        module_name = params[:module_name]
 
         if project_root
           changeDirCommand = "cd #{project_root}"
@@ -20,18 +21,18 @@ module Fastlane
         end
 
         if version_code.nil? && autoincrement
-          Actions::IncrementVersionCodeAction.run(app_folder_name: nil, version_code: nil)
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: nil)
+          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: nil)
+          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
         elsif version_code != nil
-          Actions::IncrementVersionCodeAction.run(app_folder_name: nil, version_code: version_code)
+          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: version_code)
         else
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: nil)
+          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
         end
 
         if version_name != nil
-          Actions::IncrementVersionNameAction.run(app_folder_name: nil, version_name: version_name)
+          Actions::IncrementVersionNameAction.run(app_folder_name: module_name, version_name: version_name)
         else
-          version_name = Actions::GetVersionNameAction.run(app_folder_name: nil)
+          version_name = Actions::GetVersionNameAction.run(app_folder_name: module_name)
         end
 
         UI.message "Name: #{version_name} Code: #{version_code}".blue
@@ -69,6 +70,10 @@ module Fastlane
                                        env_name: "ML_UPDATE_ANDROID_VERSION_PROJECT_ROOT",
                                        description: "[Optional] Path to the project root. If not provided will use current directory",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :module_name,
+                                       env_name: "ML_UPDATE_ANDROID_VERSION_MODULE_NAME",
+                                       description: "[Optional] App/Lib module name",
+                                       optional: true)
         ]
       end
 
