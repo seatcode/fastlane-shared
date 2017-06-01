@@ -18,12 +18,8 @@
 # Update this, if you use features of a newer version
 fastlane_version "2.32.1"
 
-platform :ios do
-  lane :dependencies do
-    lg_dependencies(
-      lg_just_info: false
-    )
-  end
+before_all do
+  # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."
 end
 
 after_all do |lane|
@@ -39,4 +35,19 @@ error do |lane, exception|
     message: "Failed: #{exception.message}"
   )
   UI.error "exception: #{exception.message}"
+end
+
+desc "Will Check and show all fastlane dependencies, also downloads/updates them for you"
+lane :dependencies do
+  lg_dependencies(
+    lg_just_info: false
+  )
+end
+
+desc "Will update project strings reading from the provided Google spreadsheet"
+lane :strings do
+  lg_strings(
+    repository_path: "./",
+    mark_unused_strings: false
+  )
 end
