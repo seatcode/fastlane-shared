@@ -51,3 +51,137 @@ lane :strings do
     mark_unused_strings: false
   )
 end
+
+platform :ios do
+
+  desc "Sets a new tag to the current Repository, update podspec and push everything. You can use allow_warnings:true as parameter"
+  lane :lib_tag do |options|
+
+    version = version_get_podspec(path: ENV["PODSPEC_FILE"])
+
+    if git_branch != "develop"
+      continue = ask("\n\nWARNING! You are creating a tag in a branch different than DEVELOP, do you want yo continue? (y/n)".yellow)
+      if continue.nil? || continue != "y"
+        raise "Move to the correct branch and restart the process :)"
+      end
+    end
+
+    sh("git fetch")
+    local = sh("git rev-parse @")
+    remote = sh("git rev-parse @{u}")
+    base =  sh("git merge-base @ @{u}")
+
+    if local != remote
+      automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
+      if automatic_pull != "y"
+        raise "Sync your branch and restart the process :)"
+      end
+    end
+
+    UI.message ("➡️  Current Podspec version: #{version}").blue
+
+    rb_info_collector(
+      ask_for_version_number: true,
+    )
+
+    version_bump_podspec(
+      path: ENV["PODSPEC_FILE"],
+      version_number: Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NUMBER]
+    )
+
+    version_number = Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NUMBER]
+    if Gem::Version.new(version) > Gem::Version.new(version_number)
+      raise "Current version is bigger than the one you provided. Check it and restart the process :)"
+    end
+
+    git_commit(
+      path: "./#{ENV["PODSPEC_FILE"]}",
+      message: "Podspec version Bump to " + Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NUMBER]
+    )
+
+    add_git_tag(
+      tag: Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NUMBER],
+    )
+
+    push_to_git_remote(
+      local_branch: git_branch,
+    )
+
+    pod_push(
+      path: ENV["PODSPEC_FILE"],
+      repo: 'metropolis',
+      allow_warnings: options[:allow_warnings] ? true : false
+    )
+
+    version_number = Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NUMBER]
+
+    slack(
+      message: "New tag in #{ENV["PODSPEC_FILE"]} iOS `#{version_number}` @channel :tada:",
+      success: true,
+      channel: "#mobile",  # Optional, by default will post to the default channel configured for the POST URL.
+    )
+  end
+
+  desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
+  lane :ci do
+    pullRequest = nil
+    if !ENV["TEAMCITY_BRANCH"].nil?
+      pullRequest = ENV["TEAMCITY_BRANCH"].sub('/merge', '')
+    end
+
+    lg_github_status(
+      gh_pull_request: pullRequest,
+      gh_status_finished: false
+    )
+
+    testException = nil
+    begin
+      test 
+    rescue => ex
+      testException = ex
+    end
+
+    lg_github_status(
+      gh_pull_request: pullRequest,
+      gh_status_finished: true,
+      scan_results_junit: "./scanresults/report.junit",
+      scan_results_url: ENV["GITHUB_STATUS_DETAIL"]
+    )
+    if testException
+      raise testException
+    end
+  end
+end
+
+platform :android do
+  desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
+  lane :ci do
+    pullRequest = nil
+    if !ENV["TEAMCITY_BRANCH"].nil?
+      pullRequest = ENV["TEAMCITY_BRANCH"].sub('/merge', '')
+    end
+
+    lg_github_status(
+      gh_pull_request: pullRequest,
+      gh_status_finished: false
+    )
+
+    testException = nil
+    begin
+      test 
+    rescue => ex
+      testException = ex
+    end
+
+    lg_github_status(
+      gh_pull_request: pullRequest,
+      gh_status_finished: true,
+      scan_results_junit: "./app/build/test-results/testDebugUnitTest/report.junit",
+      scan_results_url: ENV["GITHUB_STATUS_DETAIL"] #./app/build/reports/tests/testDebugUnitTest/index.html
+    )
+    if testException
+      raise testException
+    end
+  end
+end 
+
