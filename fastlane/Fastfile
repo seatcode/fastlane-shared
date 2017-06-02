@@ -37,7 +37,7 @@ error do |lane, exception|
   UI.error "exception: #{exception.message}"
 end
 
-desc "Will Check and show all fastlane projects dependencies, also downloads/updates them for you"
+desc "Will Check and show all fastlane projects dependencies (for both Android and iOS), also downloads/updates them for you"
 lane :dependencies do
   lg_dependencies(
     lg_just_info: false
@@ -45,7 +45,7 @@ lane :dependencies do
 end
 
 desc "Will update project strings reading from the provided Google spreadsheet"
-lane :strings do
+private_lane :update_strings do
   lg_strings(
     repository_path: "./",
     mark_unused_strings: false
@@ -123,7 +123,7 @@ platform :ios do
   end
 
   desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
-  lane :ci do
+  private_lane :ci_run do
     pullRequest = nil
     if !ENV["TEAMCITY_BRANCH"].nil?
       pullRequest = ENV["TEAMCITY_BRANCH"].sub('/merge', '')
@@ -221,7 +221,7 @@ platform :android do
   end
 
   desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
-  lane :ci do
+  private_lane :ci_run do
     pullRequest = nil
     if !ENV["TEAMCITY_BRANCH"].nil?
       pullRequest = ENV["TEAMCITY_BRANCH"].sub('/merge', '')
