@@ -12,7 +12,6 @@ module Fastlane
           continue = ask("\n\nWARNING! You are in a branch that doesn't match `#{branch}`, do you want yo continue? (y/n)".yellow)
           if continue.nil? || continue != "y"
             UI.user_error!("Git is not on a branch matching `#{branch}`. Current branch is `#{Actions.git_branch}`! Please ensure the repo is checked out to the correct branch.")
-            # raise "Move to the correct branch and restart the process :)"
           end
         end
       end

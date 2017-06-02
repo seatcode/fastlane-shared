@@ -61,16 +61,7 @@ platform :ios do
 
     check_git_branch( branch: "develop")
 
-    sh("git fetch")
-    local = sh("git rev-parse @")
-    remote = sh("git rev-parse @{u}")
-
-    if local != remote
-      automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
-      if automatic_pull != "y"
-        raise "Sync your branch and restart the process :)"
-      end
-    end
+    ensure_git_up_to_date
 
     UI.message ("➡️  Current Podspec version: #{version}").blue
 
@@ -154,16 +145,7 @@ platform :android do
 
     check_git_branch( branch: "develop")
 
-    sh("git fetch")
-    local = sh("git rev-parse @")
-    remote = sh("git rev-parse @{u}")
-
-    if local != remote
-      automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
-      if automatic_pull != "y"
-        raise "Sync your branch and restart the process :)"
-      end
-    end
+    ensure_git_up_to_date
 
     version = get_version_name(app_folder_name: ENV['MODULE_NAME'])
 
@@ -238,5 +220,4 @@ platform :android do
     end
   end
 end 
-
 
