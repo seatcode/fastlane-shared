@@ -59,17 +59,11 @@ platform :ios do
 
     version = version_get_podspec(path: ENV["PODSPEC_FILE"])
 
-    if git_branch != "develop"
-      continue = ask("\n\nWARNING! You are creating a tag in a branch different than DEVELOP, do you want yo continue? (y/n)".yellow)
-      if continue.nil? || continue != "y"
-        raise "Move to the correct branch and restart the process :)"
-      end
-    end
+    check_git_branch( branch: "develop")
 
     sh("git fetch")
     local = sh("git rev-parse @")
     remote = sh("git rev-parse @{u}")
-    base =  sh("git merge-base @ @{u}")
 
     if local != remote
       automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
@@ -158,17 +152,11 @@ platform :android do
   desc "Sets a new tag to the current Repository, updates gradle repo"
   private_lane :lib_tag do |options|
 
-    if git_branch != "develop"
-      continue = ask("\n\nWARNING! You are creating a tag in a branch different than DEVELOP, do you want yo continue? (y/n)".yellow)
-      if continue.nil? || continue != "y"
-        raise "Move to the correct branch and restart the process :)"
-      end
-    end
+    check_git_branch( branch: "develop")
 
     sh("git fetch")
     local = sh("git rev-parse @")
     remote = sh("git rev-parse @{u}")
-    base =  sh("git merge-base @ @{u}")
 
     if local != remote
       automatic_pull = ask("Warning! Your branch is not up to date with the Remote, you may need to pull/push your changes, do you want to continue anyway (y/n)".yellow)
@@ -250,4 +238,5 @@ platform :android do
     end
   end
 end 
+
 

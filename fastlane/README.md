@@ -29,10 +29,14 @@ xcode-select --install
 </table>
 
 # Available Actions
-## iOS
-### ios dependencies
+### dependencies
 ```
-fastlane ios dependencies
+fastlane dependencies
+```
+Will Check and show all fastlane projects dependencies (for both Android and iOS), also downloads/updates them for you
+### eliprueba
+```
+fastlane eliprueba
 ```
 
 
