@@ -5,9 +5,10 @@ module Fastlane
 
     class LgGithubStatusAction < Action
 
+
       def self.run(params)
-        require Octokit
-        
+        require "octokit"
+
         username = params[:gh_user]
         password = params[:gh_password]
         repo = params[:gh_repository]
