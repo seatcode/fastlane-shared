@@ -8,6 +8,7 @@ module Fastlane
 
       def self.run(params)
         require "octokit"
+        require "crack"
 
         username = params[:gh_user]
         password = params[:gh_password]
