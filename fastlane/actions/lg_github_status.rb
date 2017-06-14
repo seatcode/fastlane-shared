@@ -16,18 +16,6 @@ module Fastlane
         pullRequest = params[:gh_pull_request]
         resultsUrl = params[:scan_results_url]
 
-        if username.nil?          
-            UI.error "Github username not provided!"
-            exit 1
-        end
-        if password.nil?          
-            UI.error "Github password not provided!"
-            exit 1
-        end
-        if repo.nil?
-            UI.error "Github repo not provided!"
-            exit 1
-        end
         if pullRequest.nil? || pullRequest.empty?
           prTryout = Actions.sh "git name-rev --name-only HEAD | tr -d -c 0-9"
           if prTryout.nil? || prTryout.empty?      
@@ -105,7 +93,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :gh_pull_request,
                                        env_name: "GITHUB_PULL_REQUEST",
                                        description: "Github pull request number",
-                                       optional: false),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :gh_status_finished,
                                        env_name: "STATUS_FINISHED",
                                        description: "Whether is finished and results must be parsed",
