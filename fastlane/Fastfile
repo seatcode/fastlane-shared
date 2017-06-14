@@ -129,8 +129,7 @@ platform :ios do
     lg_github_status(
       gh_pull_request: pullRequest,
       gh_status_finished: true,
-      scan_results_junit: "./scanresults/report.junit",
-      scan_results_url: ENV["GITHUB_STATUS_DETAIL"]
+      scan_results_junit: "./scanresults/report.junit"
     )
     if testException
       raise testException
@@ -212,8 +211,7 @@ platform :android do
     lg_github_status(
       gh_pull_request: pullRequest,
       gh_status_finished: true,
-      scan_results_junit: "./app/build/test-results/testDebugUnitTest/report.junit",
-      scan_results_url: ENV["GITHUB_STATUS_DETAIL"] #./app/build/reports/tests/testDebugUnitTest/index.html
+      scan_results_junit: "./app/build/test-results/testDebugUnitTest/report.junit"
     )
     if testException
       raise testException
