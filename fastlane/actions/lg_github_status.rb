@@ -28,9 +28,13 @@ module Fastlane
             UI.error "Github repo not provided!"
             exit 1
         end
-        if pullRequest.nil?
+        if pullRequest.nil? || pullRequest.empty?
+          prTryout = Actions.sh "git name-rev --name-only HEAD | tr -d -c 0-9"
+          if prTryout.nil? || prTryout.empty?      
             UI.error "Github pull request not provided!"
             exit 1
+          end
+          pullRequest = prTryout
         else
           UI.message "Selected #{pullRequest} pullRequest".blue
         end
