@@ -31,6 +31,8 @@ module Fastlane
         if pullRequest.nil?
             UI.error "Github pull request not provided!"
             exit 1
+        else
+          UI.message "Selected #{pullRequest} pullRequest".blue
         end
 
         client = Octokit::Client.new(:login => username, :password => password)
