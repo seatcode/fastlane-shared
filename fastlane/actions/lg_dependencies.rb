@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)        
 
         gemsRequired = ["fastlane", "badge", "danger", "octokit", "crack", "byebug", "micro-optparse", "google_drive", "colorize"]
-        commandsRequired = ["imagemagick"]
+        commandsRequired = ["git-lfs, imagemagick"]
 
         if params[:lg_just_info]
           checkGems(gemsRequired)
@@ -203,9 +203,9 @@ module Fastlane
       def self.getBrewPkgVersion(name, remote)
         command = ""
         if remote 
-          command = "brew info imagemagick | cat | head -n1 | sed 's/[^0-9.]*\\([0-9.]*\\).*/\\1/'"
+          command = "brew info #{name} | cat | head -n1 | sed 's/[^0-9.]*\\([0-9.]*\\).*/\\1/'"
         else
-          command = "brew list imagemagick --versions | sed 's/[^0-9.]*\\([0-9.]*\\).*/\\1/'"
+          command = "brew list #{name} --versions | sed 's/[^0-9.]*\\([0-9.]*\\).*/\\1/'"
         end
         return FastlaneCore::CommandExecutor.execute(command: command, 
                                                      print_all: false, 
