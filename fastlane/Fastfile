@@ -112,7 +112,6 @@ platform :ios do
     
     if !is_ci 
       lg_github_status(
-        gh_pull_request: pullRequest,
         gh_status_finished: false
       )
     end
@@ -126,7 +125,6 @@ platform :ios do
 
     if !is_ci 
       lg_github_status(
-        gh_pull_request: pullRequest,
         gh_status_finished: true,
         scan_results_junit: "./scanresults/report.junit"
       )
