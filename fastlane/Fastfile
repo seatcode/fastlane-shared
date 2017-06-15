@@ -109,15 +109,13 @@ platform :ios do
 
   desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
   private_lane :ci_run do
-    pullRequest = nil
-    if !ENV["TEAMCITY_BRANCH"].nil?
-      pullRequest = ENV["TEAMCITY_BRANCH"].sub('/merge', '')
+    
+    if !is_ci 
+      lg_github_status(
+        gh_pull_request: pullRequest,
+        gh_status_finished: false
+      )
     end
-
-    lg_github_status(
-      gh_pull_request: pullRequest,
-      gh_status_finished: false
-    )
 
     testException = nil
     begin
@@ -126,11 +124,13 @@ platform :ios do
       testException = ex
     end
 
-    lg_github_status(
-      gh_pull_request: pullRequest,
-      gh_status_finished: true,
-      scan_results_junit: "./scanresults/report.junit"
-    )
+    if !is_ci 
+      lg_github_status(
+        gh_pull_request: pullRequest,
+        gh_status_finished: true,
+        scan_results_junit: "./scanresults/report.junit"
+      )
+    end
     if testException
       raise testException
     end
