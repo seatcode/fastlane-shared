@@ -34,11 +34,6 @@ xcode-select --install
 fastlane dependencies
 ```
 Will Check and show all fastlane projects dependencies (for both Android and iOS), also downloads/updates them for you
-### eliprueba
-```
-fastlane eliprueba
-```
-
 
 ----
 
