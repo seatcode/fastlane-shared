@@ -97,6 +97,7 @@ platform :ios do
       message: "New tag in #{ENV["PODSPEC_FILE"]} iOS `#{version_number}` @channel :tada:",
       success: true,
       channel: "#mobile",  # Optional, by default will post to the default channel configured for the POST URL.
+      default_payloads: [:lane, :git_branch]
     )
   end
 
