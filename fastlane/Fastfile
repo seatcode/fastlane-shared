@@ -111,11 +111,13 @@ platform :ios do
   desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
   private_lane :ci_run do
     
-    # if !is_ci 
-    #   lg_github_status(
-    #     gh_status_finished: false
-    #   )
-    # end
+    pullRequest = ""
+    if !is_ci 
+      pullReuest = ask("Pull request number = ".yellow)
+      github_status_start(
+        gh_pull_request: pullRequest
+      )
+    end
 
     testException = nil
     begin
@@ -124,95 +126,14 @@ platform :ios do
       testException = ex
     end
 
-    # if !is_ci 
-    #   lg_github_status(
-    #     gh_status_finished: true,
-    #     scan_results_junit: "./scanresults/report.junit"
-    #   )
-    # end
+    if !is_ci 
+      github_status_finish(
+        gh_pull_request: pullRequest,
+        scan_results_junit: "./scanresults/report.junit"
+      )
+    end
     if testException
       raise testException
     end
   end
 end
-
-platform :android do
-
-  desc "Sets a new tag to the current Repository, updates gradle repo"
-  private_lane :lib_tag do |options|
-
-    check_git_branch( branch: "develop")
-
-    ensure_git_up_to_date
-
-    version = get_version_name(app_folder_name: ENV['MODULE_NAME'])
-
-    UI.message ("➡️  Current version: #{version}").blue
-
-    rb_info_collector(
-      ask_for_version_name: true,
-    )
-
-    version_name = Actions.lane_context[Actions::SharedValues::RB_INFO_VERSION_NAME]
-
-    if Gem::Version.new(version) > Gem::Version.new(version_name)
-      raise "Current version is bigger than the one you provided. Check it and restart the process :)"
-    end
-
-    ml_update_android_version(
-      version_name: version_name,
-      autoincrement: true,
-      module_name: ENV["MODULE_NAME"]
-    )
-
-    git_commit(
-      path: ".",
-      message: "Version Bump to " + version_name
-    )
-
-    add_git_tag(
-      tag: version_name,
-    )
-
-    push_to_git_remote(
-      local_branch: git_branch,
-    )
-
-    # Publish to my maven repo
-    gradle(task: "publish")
-
-    slack(
-      message: "New tag in #{ENV["PROJECT_NAME"]} Android `#{version_name}` @channel :tada:",
-      success: true,
-      channel: "#mobile",  # Optional, by default will post to the default channel configured for the POST URL.
-    )
-  end
-
-  desc "C.I. Lane, it runs 'test' lane from a PR and publishes on github the result"
-  private_lane :ci_run do
-    # if !is_ci 
-    #   lg_github_status(
-    #     gh_status_finished: false
-    #   )
-    # end
-
-    testException = nil
-    begin
-      test 
-    rescue => ex
-      testException = ex
-    end
-
-    # if !is_ci 
-    #   lg_github_status(
-    #     gh_status_finished: true,
-    #     scan_results_junit: "./app/build/test-results/testDebugUnitTest/report.junit"
-    #   )
-    # end
-
-    if testException
-      raise testException
-    end
-  end
-end 
-
