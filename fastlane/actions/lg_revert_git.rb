@@ -43,7 +43,7 @@ module Fastlane
       end
 
       def self.author
-        'LetGo'
+        "Eli Kohen"
       end
 
       def self.is_supported?(platform)

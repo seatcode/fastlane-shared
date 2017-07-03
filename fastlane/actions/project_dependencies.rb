@@ -256,8 +256,8 @@ module Fastlane
         [ ]
       end
 
-      def self.authors
-        ["letgo"]
+      def self.author
+        "Eli Kohen"
       end
 
       def self.is_supported?(platform)

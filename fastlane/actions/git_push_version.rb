@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class LgPushAction < Action
+    class GitPushVersionAction < Action
       def self.run(params)
 
         path_to_repo = params[:repository_path]
@@ -29,16 +29,16 @@ module Fastlane
 
       def self.available_options
         [
-         FastlaneCore::ConfigItem.new(key: :repository_path,
-                                       env_name: "RB_UPDATE_APP_VERSION_REPO_PATH",
+          FastlaneCore::ConfigItem.new(key: :repository_path,
+                                       env_name: "GIT_PUSH_VERSION_VERSION_REPO_PATH",
                                        description: "Path to the repository",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :build_number,
-                                       env_name: "RB_UPDATE_APP_VERSION_BUILD_NUMBER",
+                                       env_name: "GIT_PUSH_VERSION_BUILD_NUMBER",
                                        description: "Build number aka CFBundleVersion",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :version_number,
-                                       env_name: "RB_UPDATE_APP_VERSION_VERSION_NUMBER",
+                                       env_name: "GIT_PUSH_VERSION_VERSION_NUMBER",
                                        description: "Version number aka CFBundleShortVersionString",
                                        optional: false),
         ]
@@ -48,8 +48,8 @@ module Fastlane
         [ ]
       end
 
-      def self.authors
-        ["letgo"]
+      def self.author
+        "Eli Kohen"
       end
 
       def self.is_supported?(platform)
