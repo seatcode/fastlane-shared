@@ -45,14 +45,6 @@ lane :dependencies do
   )
 end
 
-desc "Will update project strings reading from the provided Google spreadsheet"
-private_lane :update_strings do
-  lg_strings(
-    repository_path: "./",
-    mark_unused_strings: false
-  )
-end
-
 platform :ios do
 
   desc "Sets a new tag to the current Repository, update podspec and push everything. You can use allow_warnings:true as parameter"
