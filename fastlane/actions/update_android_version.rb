@@ -1,11 +1,11 @@
 module Fastlane
   module Actions
     module SharedValues
-      ML_VERSION_NAME = :ML_VERSION_NAME
-      ML_VERSION_CODE = :ML_VERSION_CODE
+      ANDROID_VERSION_NAME = :ANDROID_VERSION_NAME
+      ANDROID_VERSION_CODE = :ANDROID_VERSION_CODE
     end
 
-    class MlUpdateAndroidVersionAction < Action
+    class UpdateAndroidVersionAction < Action
 
       def self.run(params)
         version_name = params[:version_name]
@@ -54,24 +54,24 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :version_name,
-                                       env_name: "ML_UPDATE_ANDROID_VERSION_NAME",
+                                       env_name: "UPDATE_ANDROID_VERSION_NAME",
                                        description: "Version name (ak 1.0.2",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :version_code,
-                                       env_name: "ML_UPDATE_ANDROID_VERSION_CODE",
+                                       env_name: "UPDATE_ANDROID_VERSION_CODE",
                                        description: "Version code (ak build number)",
                                        optional: true),  
           FastlaneCore::ConfigItem.new(key: :autoincrement,
-                                       env_name: "ML_UPDATE_ANDROID_VERSION_AUTOINCREMENT",
+                                       env_name: "UPDATE_ANDROID_VERSION_AUTOINCREMENT",
                                        description: "TRUE if you want to autoincrement the Version code",
                                        optional: true,
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :project_root,
-                                       env_name: "ML_UPDATE_ANDROID_VERSION_PROJECT_ROOT",
+                                       env_name: "UPDATE_ANDROID_VERSION_PROJECT_ROOT",
                                        description: "[Optional] Path to the project root. If not provided will use current directory",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :module_name,
-                                       env_name: "ML_UPDATE_ANDROID_VERSION_MODULE_NAME",
+                                       env_name: "UPDATE_ANDROID_VERSION_MODULE_NAME",
                                        description: "[Optional] App/Lib module name",
                                        optional: true)
         ]
@@ -79,8 +79,8 @@ module Fastlane
 
       def self.output
         [
-          ['ML_VERSION_NAME', 'The new version name'],
-          ['ML_VERSION_CODE', 'The new version code']
+          ['ANDROID_VERSION_NAME', 'The new version name'],
+          ['ANDROID_VERSION_CODE', 'The new version code']
         ]
       end
 
