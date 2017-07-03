@@ -5,12 +5,17 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: Verifying required fastlane version" time="0.000876">
+      <testcase classname="fastlane.lanes" name="0: Verifying required fastlane version" time="0.000905">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: lg_dependencies" time="10.41002">
+      <testcase classname="fastlane.lanes" name="1: project_dependencies" time="12.039538">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: notification" time="0.172109">
         
       </testcase>
     

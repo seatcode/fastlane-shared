@@ -40,8 +40,8 @@ end
 
 desc "Will Check and show all fastlane projects dependencies (for both Android and iOS), also downloads/updates them for you"
 lane :dependencies do
-  lg_dependencies(
-    lg_just_info: false
+  project_dependencies(
+    just_info: false
   )
 end
 
