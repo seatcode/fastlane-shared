@@ -113,7 +113,7 @@ platform :ios do
     
     pullRequest = ""
     if !is_ci 
-      pullReuest = ask("Pull request number = ".yellow)
+      pullRequest = ask("Pull request number = ".yellow)
       github_status_start(
         gh_pull_request: pullRequest
       )

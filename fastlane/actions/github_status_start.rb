@@ -13,7 +13,6 @@ module Fastlane
         password = params[:gh_password]
         repo = params[:gh_repository]
         pullRequest = params[:gh_pull_request]
-        resultsUrl = params[:scan_results_url]
 
         client = Octokit::Client.new(:login => username, :password => password)
         commits = client.pull_request_commits(repo, pullRequest.to_i)
