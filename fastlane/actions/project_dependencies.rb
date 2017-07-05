@@ -7,7 +7,7 @@ module Fastlane
       def self.run(params)        
 
         gemsRequired = ["fastlane", "badge", "danger", "octokit", "crack", "byebug", "micro-optparse", "google_drive", "colorize"]
-        commandsRequired = ["git-lfs", "imagemagick"]
+        commandsRequired = ["git-lfs", "librsvg", "imagemagick"]
 
         if params[:just_info]
           checkGems(gemsRequired)
