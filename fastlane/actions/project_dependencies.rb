@@ -3,13 +3,13 @@ module Fastlane
     module SharedValues
     end
 
-    class LgDependenciesAction < Action
+    class ProjectDependenciesAction < Action
       def self.run(params)        
 
         gemsRequired = ["fastlane", "badge", "danger", "octokit", "crack", "byebug", "micro-optparse", "google_drive", "colorize"]
-        commandsRequired = ["git-lfs, imagemagick"]
+        commandsRequired = ["git-lfs", "librsvg", "imagemagick"]
 
-        if params[:lg_just_info]
+        if params[:just_info]
           checkGems(gemsRequired)
           checkCommands(commandsRequired)
         else
@@ -243,8 +243,8 @@ module Fastlane
 
       def self.available_options
         [           
-          FastlaneCore::ConfigItem.new(key: :lg_just_info,
-                                       env_name: "LG_DEPENDENCIES_JUST_INFO",
+          FastlaneCore::ConfigItem.new(key: :just_info,
+                                       env_name: "PROJECT_DEPENDENCIES_JUST_INFO",
                                        description: "Whether to show just information or install/update",
                                        is_string: false,
                                        default_value: true,
@@ -256,8 +256,8 @@ module Fastlane
         [ ]
       end
 
-      def self.authors
-        ["letgo"]
+      def self.author
+        "Eli Kohen"
       end
 
       def self.is_supported?(platform)

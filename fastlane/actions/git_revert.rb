@@ -3,7 +3,7 @@ module Fastlane
     module SharedValues
     end
 
-    class LgRevertGitAction < Action
+    class GitRevertAction < Action
       def self.run(params)
         path_to_repo = params[:repository_path]
         items_to_revert = params[:items_to_revert]
@@ -28,11 +28,11 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :items_to_revert,
-                                       env_name: "LG_REVERT_GIT_ITEMS_TO_REVERT",
+                                       env_name: "GIT_REVERT_ITEMS_TO_REVERT",
                                        description: "Items to revert inside repo path",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repository_path,
-                                       env_name: "LG_REVERT_GIT_REPO_PATH",
+                                       env_name: "GIT_REVERT_REPO_PATH",
                                        description: "[Optional] Path to the repository. If not provided will use current directory",
                                        optional: true)
         ]
@@ -43,7 +43,7 @@ module Fastlane
       end
 
       def self.author
-        'LetGo'
+        "Eli Kohen"
       end
 
       def self.is_supported?(platform)
