@@ -37,8 +37,8 @@ module Fastlane
 
         UI.message "Name: #{version_name} Code: #{version_code}".blue
 
-        Actions.lane_context[SharedValues::ML_VERSION_NAME] = version_name
-        Actions.lane_context[SharedValues::ML_VERSION_CODE] = version_code
+        Actions.lane_context[SharedValues::ANDROID_VERSION_NAME] = version_name
+        Actions.lane_context[SharedValues::ANDROID_VERSION_CODE] = version_code
       end
 
 
