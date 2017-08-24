@@ -20,20 +20,26 @@ module Fastlane
           Actions.sh changeDirCommand
         end
 
-        if version_code.nil? && autoincrement
-          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: nil)
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
-        elsif version_code != nil
-          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: version_code)
-        else
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
-        end
+        version_code = getBuildValue(".", "androidVersionCode") 
+        version_name = getBuildValue(".", "androidVersionName")
 
-        if version_name != nil
-          Actions::IncrementVersionNameAction.run(app_folder_name: module_name, version_name: version_name)
-        else
-          version_name = Actions::GetVersionNameAction.run(app_folder_name: module_name)
-        end
+        setBuildValue(".", "androidVersionCode", 27)
+        setBuildValue(".", "androidVersionName", "7.8.9")
+
+        # if version_code.nil? && autoincrement
+        #   other_action.increment_version_code(gradle_file_path: "./build.gradle", version_code: nil, ext_constant_name: "androidVersionCode")
+        #   version_code = other_action.get_version_code(gradle_file_path: "./build.gradle", ext_constant_name: "androidVersionCode")
+        # elsif version_code != nil
+        #   other_action.increment_version_code(app_folder_name: module_name, gradle_file_path: "./build.gradle", version_code: version_code, ext_constant_name: "androidVersionCode")
+        # else
+        #   version_code = other_action.get_version_code(app_folder_name: module_name, gradle_file_path: "./build.gradle", ext_constant_name: "androidVersionCode")
+        # end
+
+        # if version_name != nil
+        #   other_action.increment_version_name(app_folder_name: module_name, version_name: version_name, ext_constant_name: "androidVersionName")
+        # else
+        #   version_name = other_action.get_version_name(app_folder_name: module_name, ext_constant_name: "androidVersionName")
+        # end
 
         UI.message "Name: #{version_name} Code: #{version_code}".blue
 
@@ -41,6 +47,53 @@ module Fastlane
         Actions.lane_context[SharedValues::ANDROID_VERSION_CODE] = version_code
       end
 
+      def self.getBuildValue(fileFolder, key)
+        value = ""
+        found = false
+        Dir.glob("#{fileFolder}/build.gradle") do |path|
+          begin
+            File.open(path, 'r') do |file|
+              file.each_line do |line|
+                unless line.include? "#{key}" and !found
+                  next
+                end
+                components = line.strip.split(' ')
+                value = components.last.tr("\"", "").tr("\'", "")
+                break
+              end
+              file.close
+            end
+          end
+        end
+        return value
+      end
+
+      def self.setBuildValue(fileFolder, key, newValue)
+        found = false
+        Dir.glob("#{fileFolder}/build.gradle") do |path|
+          begin
+            temp_file = Tempfile.new('versioning')
+            File.open(path, 'r') do |file|
+              file.each_line do |line|
+                unless line.include? "#{key} " and !found
+                  temp_file.puts line
+                  next
+                end
+                components = line.strip.split(' ')
+                value = components.last.tr("\"", "").tr("\'", "")
+                line.replace line.sub(value, newValue.to_s)
+                found = true
+                temp_file.puts line
+              end
+              file.close
+            end
+            temp_file.rewind
+            temp_file.close
+            FileUtils.mv(temp_file.path, path)
+            temp_file.unlink
+          end
+        end
+      end
 
 
       #####################################################
