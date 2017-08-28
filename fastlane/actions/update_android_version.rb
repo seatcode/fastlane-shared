@@ -11,28 +11,24 @@ module Fastlane
         version_name = params[:version_name]
         version_code = params[:version_code]
         autoincrement = params[:autoincrement] #will only work if version_code is not passed
-        project_root = params[:project_root]
-        module_name = params[:module_name]
-
-        if project_root
-          changeDirCommand = "cd #{project_root}"
-          UI.message changeDirCommand
-          Actions.sh changeDirCommand
-        end
+        project_root = params[:gradle_root]
+        version_name_key = params[:version_name_key]
+        version_code_key = params[:version_code_key]
 
         if version_code.nil? && autoincrement
-          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: nil)
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
+          currentVersionCode = getBuildValue(project_root, version_code_key).to_i
+          setBuildValue(project_root, version_code_key, currentVersionCode + 1)
+          version_code = getBuildValue(project_root, version_code_key)
         elsif version_code != nil
-          Actions::IncrementVersionCodeAction.run(app_folder_name: module_name, version_code: version_code)
+          setBuildValue(project_root, version_code_key, version_code)
         else
-          version_code = Actions::GetVersionCodeAction.run(app_folder_name: module_name)
+          version_code = getBuildValue(project_root, version_code_key)
         end
 
         if version_name != nil
-          Actions::IncrementVersionNameAction.run(app_folder_name: module_name, version_name: version_name)
+          setBuildValue(project_root, version_name_key, version_name)
         else
-          version_name = Actions::GetVersionNameAction.run(app_folder_name: module_name)
+          version_name = getBuildValue(project_root, version_name_key)
         end
 
         UI.message "Name: #{version_name} Code: #{version_code}".blue
@@ -41,6 +37,53 @@ module Fastlane
         Actions.lane_context[SharedValues::ANDROID_VERSION_CODE] = version_code
       end
 
+      def self.getBuildValue(fileFolder, key)
+        value = ""
+        found = false
+        Dir.glob("#{fileFolder}/build.gradle") do |path|
+          begin
+            File.open(path, 'r') do |file|
+              file.each_line do |line|
+                unless line.include? "#{key}" and !found
+                  next
+                end
+                components = line.strip.split(' ')
+                value = components.last.tr("\"", "").tr("\'", "")
+                break
+              end
+              file.close
+            end
+          end
+        end
+        return value
+      end
+
+      def self.setBuildValue(fileFolder, key, newValue)
+        found = false
+        Dir.glob("#{fileFolder}/build.gradle") do |path|
+          begin
+            temp_file = Tempfile.new('versioning')
+            File.open(path, 'r') do |file|
+              file.each_line do |line|
+                unless line.include? "#{key} " and !found
+                  temp_file.puts line
+                  next
+                end
+                components = line.strip.split(' ')
+                value = components.last.tr("\"", "").tr("\'", "")
+                line.replace line.sub(value, newValue.to_s)
+                found = true
+                temp_file.puts line
+              end
+              file.close
+            end
+            temp_file.rewind
+            temp_file.close
+            FileUtils.mv(temp_file.path, path)
+            temp_file.unlink
+          end
+        end
+      end
 
 
       #####################################################
@@ -66,14 +109,21 @@ module Fastlane
                                        description: "TRUE if you want to autoincrement the Version code",
                                        optional: true,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :project_root,
-                                       env_name: "UPDATE_ANDROID_VERSION_PROJECT_ROOT",
-                                       description: "[Optional] Path to the project root. If not provided will use current directory",
+          FastlaneCore::ConfigItem.new(key: :gradle_root,
+                                       env_name: "UPDATE_ANDROID_VERSION_GRADLE_ROOT",
+                                       description: "[Optional] Path to the build.gradle root. If not provided will use current directory",
+                                       default_value: ".",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :module_name,
-                                       env_name: "UPDATE_ANDROID_VERSION_MODULE_NAME",
-                                       description: "[Optional] App/Lib module name",
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(key: :version_name_key,
+                                       env_name: "UPDATE_ANDROID_VERSION_NAME_KEY",
+                                       description: "[Optional] Key for the version name value on the gradle file",
+                                       default_value: "versionName",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_code_key,
+                                       env_name: "UPDATE_ANDROID_VERSION_CODE_KEY",
+                                       description: "[Optional] Key for the version code value on the gradle file",
+                                       default_value: "versionCode",
+                                       optional: true),
         ]
       end
 
