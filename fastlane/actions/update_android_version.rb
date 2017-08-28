@@ -120,7 +120,7 @@ module Fastlane
                                        default_value: "versionName",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :version_code_key,
-                                       env_name: "UPDATE_ANDROID_VERSION_GRADLE_ROOT",
+                                       env_name: "UPDATE_ANDROID_VERSION_CODE_KEY",
                                        description: "[Optional] Key for the version code value on the gradle file",
                                        default_value: "versionCode",
                                        optional: true),
