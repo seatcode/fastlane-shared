@@ -11,35 +11,25 @@ module Fastlane
         version_name = params[:version_name]
         version_code = params[:version_code]
         autoincrement = params[:autoincrement] #will only work if version_code is not passed
-        project_root = params[:project_root]
-        module_name = params[:module_name]
+        project_root = params[:gradle_root]
+        version_name_key = params[:version_name_key]
+        version_code_key = params[:version_code_key]
 
-        if project_root
-          changeDirCommand = "cd #{project_root}"
-          UI.message changeDirCommand
-          Actions.sh changeDirCommand
+        if version_code.nil? && autoincrement
+          currentVersionCode = getBuildValue(project_root, version_code_key).to_i
+          setBuildValue(project_root, version_code_key, currentVersionCode + 1)
+          version_code = getBuildValue(project_root, version_code_key)
+        elsif version_code != nil
+          setBuildValue(project_root, version_code_key, version_code)
+        else
+          version_code = getBuildValue(project_root, version_code_key)
         end
 
-        version_code = getBuildValue(".", "androidVersionCode") 
-        version_name = getBuildValue(".", "androidVersionName")
-
-        setBuildValue(".", "androidVersionCode", 27)
-        setBuildValue(".", "androidVersionName", "7.8.9")
-
-        # if version_code.nil? && autoincrement
-        #   other_action.increment_version_code(gradle_file_path: "./build.gradle", version_code: nil, ext_constant_name: "androidVersionCode")
-        #   version_code = other_action.get_version_code(gradle_file_path: "./build.gradle", ext_constant_name: "androidVersionCode")
-        # elsif version_code != nil
-        #   other_action.increment_version_code(app_folder_name: module_name, gradle_file_path: "./build.gradle", version_code: version_code, ext_constant_name: "androidVersionCode")
-        # else
-        #   version_code = other_action.get_version_code(app_folder_name: module_name, gradle_file_path: "./build.gradle", ext_constant_name: "androidVersionCode")
-        # end
-
-        # if version_name != nil
-        #   other_action.increment_version_name(app_folder_name: module_name, version_name: version_name, ext_constant_name: "androidVersionName")
-        # else
-        #   version_name = other_action.get_version_name(app_folder_name: module_name, ext_constant_name: "androidVersionName")
-        # end
+        if version_name != nil
+          setBuildValue(project_root, version_name_key, version_name)
+        else
+          version_name = getBuildValue(project_root, version_name_key)
+        end
 
         UI.message "Name: #{version_name} Code: #{version_code}".blue
 
@@ -119,14 +109,21 @@ module Fastlane
                                        description: "TRUE if you want to autoincrement the Version code",
                                        optional: true,
                                        is_string: false),
-          FastlaneCore::ConfigItem.new(key: :project_root,
-                                       env_name: "UPDATE_ANDROID_VERSION_PROJECT_ROOT",
-                                       description: "[Optional] Path to the project root. If not provided will use current directory",
+          FastlaneCore::ConfigItem.new(key: :gradle_root,
+                                       env_name: "UPDATE_ANDROID_VERSION_GRADLE_ROOT",
+                                       description: "[Optional] Path to the build.gradle root. If not provided will use current directory",
+                                       default_value: ".",
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :module_name,
-                                       env_name: "UPDATE_ANDROID_VERSION_MODULE_NAME",
-                                       description: "[Optional] App/Lib module name",
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(key: :version_name_key,
+                                       env_name: "UPDATE_ANDROID_VERSION_NAME_KEY",
+                                       description: "[Optional] Key for the version name value on the gradle file",
+                                       default_value: "versionName",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :version_code_key,
+                                       env_name: "UPDATE_ANDROID_VERSION_GRADLE_ROOT",
+                                       description: "[Optional] Key for the version code value on the gradle file",
+                                       default_value: "versionCode",
+                                       optional: true),
         ]
       end
 
