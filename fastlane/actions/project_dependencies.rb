@@ -6,8 +6,8 @@ module Fastlane
     class ProjectDependenciesAction < Action
       def self.run(params)        
 
-        gemsRequired = ["fastlane", "badge", "danger", "octokit", "crack", "byebug", "micro-optparse", "google_drive", "colorize"]
-        commandsRequired = ["git-lfs", "librsvg", "imagemagick"]
+        gemsRequired = ["fastlane", "badge", "octokit", "crack", "byebug", "micro-optparse", "google_drive", "colorize"]
+        commandsRequired = ["librsvg", "imagemagick"]
 
         if params[:just_info]
           checkGems(gemsRequired)
